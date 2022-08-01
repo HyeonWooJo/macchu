@@ -13,7 +13,7 @@ class User(models.Model):
         db_table = "users"
 
 class ProductLike(TimeStampModel):
-    project = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user    = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -26,7 +26,7 @@ class Review(TimeStampModel):
         db_table = "reviews"
 
 class ReviewLike(TimeStampModel):
-    review  = models.ForeignKey(Product, on_delete=models.CASCADE)
+    review  = models.ForeignKey(Review, on_delete=models.CASCADE)
     user    = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:

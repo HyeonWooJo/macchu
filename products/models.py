@@ -6,13 +6,13 @@ import users
 class Product(TimeStampModel):
     name         = models.CharField(max_length=50, null=True)
     scent        = models.CharField(max_length=50, null=True)
-    alchol_level = models.CharField(max_length=50, null=True)
+    alchol_level = models.DecimalField(max_digits=2, decimal_places=2, default=0, null=True)
     price        = models.DecimalField(max_digits=6, decimal_places=2, default=0, null=True)
     images       = models.ManyToManyField("ProductImage", through="ProductProductImage")
     tags         = models.ManyToManyField("Tag", through="ProductTag")
     review       = models.ForeignKey("users.Review", on_delete=models.CASCADE)
-    al_category  = models.ForeignKey("AlCategory", on_delete=models.CASCADE)
-    mb_category  = models.ForeignKey("MbCategory", on_delete=models.CASCADE)
+    al_category  = models.CharField(max_length=50, null=True)
+    mb_category  = models.CharField(max_length=50, null=True)
 
     class Meta:
         db_table = 'products'
@@ -24,7 +24,7 @@ class ProductImage(models.Model):
         db_table = 'products_images'
 
 class Tag(models.Model):
-    name    = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=50, null=True)
 
     class Meta:
         db_table = 'tags'
@@ -42,15 +42,3 @@ class ProductProductImage(models.Model):
 
     class Meta:
         db_table = 'products_products_images'
-
-class AlCategory(models.Model):
-    name = models.CharField(max_length=60, null=True)
-
-    class Meta:
-        db_table = 'al_categories'
-
-class MbCategory(models.Model):
-    name = models.CharField(max_length=60, null=True)
-
-    class Meta:
-        db_table = 'mb_categories'
