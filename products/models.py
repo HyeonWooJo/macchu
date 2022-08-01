@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models  import TimeStampModel
-from users.models import Review
+import users
 
 class Product(TimeStampModel):
     name         = models.CharField(max_length=50, null=True)
@@ -10,7 +10,7 @@ class Product(TimeStampModel):
     price        = models.DecimalField(max_digits=6, decimal_places=2, default=0, null=True)
     images       = models.ManyToManyField("ProductImage", through="ProductProductImage")
     tags         = models.ManyToManyField("Tag", through="ProductTag")
-    review       = models.ForeignKey(Review, on_delete=models.CASCADE)
+    review       = models.ForeignKey("users.Review", on_delete=models.CASCADE)
     al_category  = models.ForeignKey("AlCategory", on_delete=models.CASCADE)
     mb_category  = models.ForeignKey("MbCategory", on_delete=models.CASCADE)
 
@@ -24,7 +24,6 @@ class ProductImage(models.Model):
         db_table = 'products_images'
 
 class Tag(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name    = models.CharField(max_length=50, null=True)
 
     class Meta:
