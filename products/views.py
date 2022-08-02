@@ -33,3 +33,28 @@ class ProductListView(View):
                 return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
             except Product.DoesNotExist:
                 return JsonResponse({'message' : 'PRODUCT_DOES_NOT_EXIST'}, status = 400)
+
+class ProductDetailView(View):
+    def get(self, request, product_id):
+        try:
+            product = Product.objects.annotate(like_count=Count('like__id')).get(id=product_id)             
+            
+            images = [{
+                "id"  : image.id,
+                "url" : image.url
+            } for image in product.images.all()]
+            
+            results = {
+                "product_id"    : product.id,
+                "name"          : product.name,
+                "like_count"    : product.like_count,
+                "scent"         : product.scent,
+                "alchol_level"  : product.alchol_level,
+                "al_category"   : product.al_category,
+                "mb_category"   : product.mb_category,
+                "images"        : images
+            }
+
+            return JsonResponse({'results' : results}, status = 200)
+        except Product.DoesNotExist:
+            return JsonResponse({'message' : 'PROJECT_DOES_NOT_EXIST'}, status = 400)
