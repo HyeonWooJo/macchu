@@ -1,6 +1,4 @@
 import json
-from datetime     import date
-
 import jwt
 
 from django.views import View
@@ -52,50 +50,3 @@ class UserView(View):
             'email'    : user.email
         }
         return JsonResponse({'result': result}, status=200)
-
-class LikeView(View):  
-    @login_decorator
-    def post(self, request):
-        try:
-            data       = json.loads(request.body)
-            user       = request.user
-            product_id = data['product_id']
-            product    = Product.objects.get(id=product_id)
-
-            if ProductLike.objects.filter(user=user, product=product).exists():
-                ProductLike.objects.filter(user=user, product=product).delete()
-                like_count = ProductLike.objects.filter(product=product).count()
-                return JsonResponse({'message': 'SUCCESS', 'like_count':like_count}, status=200)
-
-            ProductLike.objects.create(
-                product = product,
-                user    = user
-            )
-            like_count = ProductLike.objects.filter(product=product).count()
-
-            return JsonResponse({'message': 'SUCCESS', 'like_count': like_count}, status=200)
-
-        except KeyError:
-            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
-        except Product.DoesNotExist:
-            return JsonResponse({"message" : "PROJECT_DOES_NOT_EXIST"}, status=400)
-
-    @login_decorator
-    def get(self, request):
-        user          = request.user
-        like_products = ProductLike.objects.filter(user=user)
-        today         = date.today()
-
-        like_products = [
-            {
-                "user_id"       : user.id,
-                "product_id"    : like_product.product.id,
-                "name"          : like_product.product.name,
-                "scent"         : like_product.product.scent,
-                "alchol_level"  : like_product.product.alchol_level,
-                "al_category"   : like_product.product.al_category,
-                "mb_category"   : like_product.product.mb_category,
-            } for like_product in like_products
-        ]
-
-        return JsonResponse({'result' : like_products}, status=200)
