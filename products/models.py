@@ -6,11 +6,11 @@ import users
 class Product(TimeStampModel):
     name         = models.CharField(max_length=50, null=True)
     scent        = models.CharField(max_length=50, null=True)
-    alchol_level = models.DecimalField(max_digits=2, decimal_places=2, default=0, null=True)
+    alchol_level = models.DecimalField(max_digits=4, decimal_places=2, default=0, null=True)
     price        = models.DecimalField(max_digits=6, decimal_places=2, default=0, null=True)
     images       = models.ManyToManyField("ProductImage", through="ProductProductImage")
     tags         = models.ManyToManyField("Tag", through="ProductTag")
-    review       = models.ForeignKey("users.Review", on_delete=models.CASCADE)
+    review       = models.ForeignKey("users.Review", on_delete=models.CASCADE, null=True)
     al_category  = models.CharField(max_length=50, null=True)
     mb_category  = models.CharField(max_length=50, null=True)
 
