@@ -51,7 +51,7 @@ class UserView(View):
         }
         return JsonResponse({'result': result}, status=200)
 
-class LikeView(View):  
+class ProductLikeView(View):  
     @login_decorator
     def post(self, request):
         try:
@@ -83,7 +83,7 @@ class LikeView(View):
         user          = request.user
         like_products = ProductLike.objects.filter(user=user)
 
-        like_products = [
+        results = [
             {
                 "user_id"       : user.id,
                 "product_id"    : like_product.product.id,
@@ -95,9 +95,9 @@ class LikeView(View):
             } for like_product in like_products
         ]
 
-        return JsonResponse({'result' : like_products}, status=200)
+        return JsonResponse({'results' : results}, status=200)
 
-class ProductReview(View):  
+class ProductReviewView(View):  
     @login_decorator
     def post(self, request):
         try:
@@ -133,3 +133,46 @@ class ProductReview(View):
             }for review in reviews
         ]
         return JsonResponse({"results" : results}, status=200)
+
+class ReviewLikeView(View):  
+    @login_decorator
+    def post(self, request):
+        try:
+            data      = json.loads(request.body)
+            user      = request.user
+            review_id = data['review_id']
+            review    = Review.objects.get(id=review_id)
+
+            if ReviewLike.objects.filter(user=user, review=review).exists():
+                ReviewLike.objects.filter(user=user, review=review).delete()
+                like_count = ReviewLike.objects.filter(review=review).count()
+                return JsonResponse({'message': 'SUCCESS', 'like_count':like_count}, status=200)
+
+            ReviewLike.objects.create(
+                review = review,
+                user    = user
+            )
+            like_count = ReviewLike.objects.filter(review=review).count()
+
+            return JsonResponse({'message': 'SUCCESS', 'like_count': like_count}, status=200)
+
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+        except Review.DoesNotExist:
+            return JsonResponse({"message" : "REVIEW_DOES_NOT_EXIST"}, status=400)
+
+    @login_decorator
+    def get(self, request):
+        user          = request.user
+        like_reviews  = ReviewLike.objects.filter(user=user)
+
+        results = [
+            {
+                "user_id"    : user.id,
+                "review_id"  : like_review.review.id,
+                "product_id" : like_review.product.id,
+                "content"    : like_review.review.content
+            } for like_review in like_reviews
+        ]
+
+        return JsonResponse({'results' : results}, status=200)
