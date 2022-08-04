@@ -10,7 +10,6 @@ class Product(TimeStampModel):
     price        = models.DecimalField(max_digits=6, decimal_places=2, default=0, null=True)
     images       = models.ManyToManyField("ProductImage", through="ProductProductImage")
     tags         = models.ManyToManyField("Tag", through="ProductTag")
-    review       = models.ForeignKey("users.Review", on_delete=models.CASCADE, null=True)
     al_category  = models.CharField(max_length=50, null=True)
     mb_category  = models.CharField(max_length=50, null=True)
 

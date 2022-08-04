@@ -7,7 +7,7 @@ from django.conf  import settings
 
 from core.excepts    import Kakaoerror
 from core.utils      import KakaoAPI, login_decorator
-from users.models    import User, ProductLike
+from users.models    import Review, User, ProductLike, ReviewLike
 from products.models import Product
 
 class KakaoSigninView(View):
@@ -96,3 +96,40 @@ class LikeView(View):
         ]
 
         return JsonResponse({'result' : like_products}, status=200)
+
+class ProductReview(View):  
+    @login_decorator
+    def post(self, request):
+        try:
+            data        = json.loads(request.body)
+            user        = request.user
+            product_id  = data['product_id']
+            content     = data['content']
+
+            Review.objects.create(
+                user    = user,
+                product = Product.objects.get(id=product_id),
+                content = content
+            )
+            JsonResponse({'result' : "SUCCESS"}, status=201)
+
+        except KeyError:
+            return JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status = 400)
+        except Review.DoesNotExist:
+            return JsonResponse({"message" : "PROJECT_DOES_NOT_EXIST"}, status=400)
+
+    @login_decorator
+    def get(self, request, product_id):
+        user       = request.user
+        product    = Product.objects.get(id=product_id)
+        reviews    = Review.objects.filter(product=product, user=user)
+
+        results = [
+            {
+                "product_id"  : product.id,
+                "nickname"    : review.user.nickname,
+                "content"     : review.content,
+                "like_count"  : ReviewLike.objects.filter(user=user, review=review).count()
+            }for review in reviews
+        ]
+        return JsonResponse({"results" : results}, status=200)
